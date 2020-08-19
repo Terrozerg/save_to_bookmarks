@@ -4,14 +4,17 @@
   "name": "shitSave",
   "version": "1.0",
 
-  "description": "Saves all closed pages to bookmarks temporarily.",
+  "description": "Saves all closed pages to bookmarks temporarily.",//edit
 
   "icons": {
     "48": "icons/border-48.png"
   },
 
   "permissions": [
-    "bookmarks",
+    //"bookmarks",
+    "sessions",
+    "storage",
+    "unlimitedStorage",
     "activeTab",
     "tabs"
   ],
@@ -19,12 +22,13 @@
   "browser_action": {
     "default_icon": "icons/tooltip-32.png",
     "default_title": "shitSave"
+    //"default_popup": "popup/shitSave.html"
   },
 
   "content_scripts": [
     {
       "matches": [ "*://*/*" ],
-      "js": [ "content_scripts/shitSave.js" ]
+      "js": [ "popup/shitSave.js" ]
     }
   ],
 

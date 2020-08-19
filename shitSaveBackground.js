@@ -14,12 +14,13 @@ class TabsClass {
 //class instance
 var tabsOpened = new TabsClass("");
 
-function handleMessage(request) {
+/*function handleMessage(request) {
     console.log("transfered request: ", request);
-}
+}*/
 
 function logDebug(data) {
     console.log("DEBUUUUUUUUUG: ", data);
+    return data;
 }
 
 function onRejected(error) {
@@ -28,7 +29,9 @@ function onRejected(error) {
 
 //TODO different variables for different windows
 //add all tabs in window
+/*
 browser.windows.onRemoved.addListener((windowId) => {
+    
     if (tabsOpened) {
         console.log("Closed window: ", windowId);
         addBookmarks(tabsOpened);
@@ -37,7 +40,62 @@ browser.windows.onRemoved.addListener((windowId) => {
         console.log("window onRemoved executed but tabsOpened is null");
     }
 });
+*/
 
+//retrive saved windows
+browser.browserAction.onClicked.addListener(() => {
+    console.log("icon clicked");
+
+    let data = browser.storage.local.get();
+    data.then(restoreSavedSession)
+        .then(browser.storage.local.clear())
+        .then(test);
+});
+
+function test() {
+    console.log("Cleared storage.");
+}
+
+//get closed window
+browser.sessions.onChanged.addListener(() => {
+    //recieving sessions array
+    //TODO bug triggers when sessions are restored for each window restored
+    console.log("onChanged");
+    var currSession = browser.sessions.getRecentlyClosed({maxResults: 1});//only need recently closed window
+    currSession.then(saveSession, onRejected);
+});
+
+//save closed window
+function saveSession(data) { //goes back here after clear?
+    if (!data.length) {
+        console.log("No sessions found.");
+        return;
+    }
+    
+    if (data[0].window) {
+        console.log("window closed.", data);
+        var key = data[0].window.sessionId.toString();//session id?
+        setStorageValue(key, data[0].window);//what data needed to restore the window??
+    }
+    else if (data[0].tab){
+        console.log("tab closed.", data);
+    }
+}
+
+function setStorageValue(k, item) {
+    console.log("key and value: ", k, item);
+    browser.storage.local.set({ [k]: item });
+}
+
+function restoreSavedSession(items) {
+    console.log("Restoring items:", items);
+    for (item in items) {
+        console.log("item...", items[item]);
+        browser.sessions.restore(item.sessionId).then(logDebug, onRejected);
+    }
+}
+
+/*
 //get current tabs before any closing happens
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
     //only to work when new tab opens
@@ -93,6 +151,7 @@ function compareTabs(right) {
     console.log("filtered tabs:", testTabs);
     return testTabs;
 }
+*/
 
 /*function compareTabs(right) {
     var currtabs = tabsOpened.getTabs;
@@ -102,6 +161,7 @@ function compareTabs(right) {
     return currtabs.filter(d => !right.includes(d));
 }*/
 
+/*
 //wraper
 function addBookmarks(tabs) {
     //all bookmarks are stored in the "Other Bookmarks" folder
@@ -190,5 +250,5 @@ function addBookmarks(tabs) {
         compare();
     }
 }
-
-browser.runtime.onMessage.addListener(handleMessage);
+*/
+//browser.runtime.onMessage.addListener(handleMessage);
