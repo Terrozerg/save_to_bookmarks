@@ -14,9 +14,9 @@
     //"bookmarks",
     "sessions",
     "storage",
-    "unlimitedStorage",
-    "activeTab",
-    "tabs"
+    "unlimitedStorage"
+    //"activeTab",
+    //"tabs"
   ],
 
   "browser_action": {

@@ -1,6 +1,6 @@
 //TEst db class???
 //global variables not working? class instance working?
-class TabsClass {
+/*class TabsClass {
     constructor(tabs) {
         this.Tabs = tabs;
     }
@@ -12,7 +12,7 @@ class TabsClass {
 }
 
 //class instance
-var tabsOpened = new TabsClass("");
+var tabsOpened = new TabsClass("");*/
 
 /*function handleMessage(request) {
     console.log("transfered request: ", request);
@@ -59,14 +59,17 @@ function test() {
 //get closed window
 browser.sessions.onChanged.addListener(() => {
     //recieving sessions array
-    //TODO bug triggers when sessions are restored for each window restored
+
+    //TODO bug triggers when sessions are restored for each window
+    //TODO get tab data by sessions but restore it by opening a new windows/tabs
+
     console.log("onChanged");
     var currSession = browser.sessions.getRecentlyClosed({maxResults: 1});//only need recently closed window
     currSession.then(saveSession, onRejected);
 });
 
 //save closed window
-function saveSession(data) { //goes back here after clear?
+function saveSession(data) {
     if (!data.length) {
         console.log("No sessions found.");
         return;
@@ -77,7 +80,7 @@ function saveSession(data) { //goes back here after clear?
         var key = data[0].window.sessionId.toString();//session id?
         setStorageValue(key, data[0].window);//what data needed to restore the window??
     }
-    else if (data[0].tab){
+    else {
         console.log("tab closed.", data);
     }
 }
@@ -87,11 +90,13 @@ function setStorageValue(k, item) {
     browser.storage.local.set({ [k]: item });
 }
 
-function restoreSavedSession(items) {
-    console.log("Restoring items:", items);
-    for (item in items) {
-        console.log("item...", items[item]);
-        browser.sessions.restore(item.sessionId).then(logDebug, onRejected);
+async function restoreSavedSession(items) {
+    if (items) {
+        console.log("Restoring items:", items);
+        for (item in items) {
+            console.log("item...", items[item]);
+            await browser.sessions.restore(items[item].sessionId);
+        }
     }
 }
 
